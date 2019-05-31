@@ -16,17 +16,32 @@ var (
 )
 
 type Config struct {
-	PostgresURL string
+	PostgresURL  string
+	GCPProjectID string
+	GCPTopicID   string
 }
 
 func main() {
 	config := Config{}
-	pgurl, present := os.LookupEnv("PG_URL")
 
+	pgurl, present := os.LookupEnv("PG_URL")
 	if !present {
 		log.Fatal("No postgres url provided")
 	}
 	config.PostgresURL = pgurl
+
+	projectid, present := os.LookupEnv("PROJECT_ID")
+
+	if !present {
+		log.Fatal("No project id provided")
+	}
+	config.GCPProjectID = projectid
+
+	topicid, present := os.LookupEnv("TOPIC_ID")
+	if !present {
+		log.Fatal("No topic provided")
+	}
+	config.GCPTopicID = topicid
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case runcommand.FullCommand():

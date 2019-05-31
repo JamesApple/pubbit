@@ -7,10 +7,12 @@ import (
 	"github.com/lib/pq"
 )
 
-func readMessages(messages chan (string)) {
+func readMessages(messages chan (string), pubber pubber) {
 	for {
 		data := <-messages
 		log.Println(data)
+		pubber.pub(data)
+		log.Println("Pubbed the data")
 	}
 }
 
@@ -28,9 +30,11 @@ func run(config Config) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	pubber := newPubber(config)
+	defer pubber.topic.Stop()
 
 	message := make(chan string, 100)
-	go readMessages(message)
+	go readMessages(message, pubber)
 
 	for {
 		select {
